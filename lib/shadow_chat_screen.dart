@@ -6,29 +6,29 @@ class ShadowChatScreen extends StatefulWidget {
 }
 
 class _ShadowChatScreenState extends State<ShadowChatScreen> {
-  // قائمة الرسائل بتصميم مطابق للجو المرعب
-  final List<Map<String, dynamic>> messages = [
+  // قائمة الرسائل بتصميم مزدوج (إنجليزي وتحته عربي)
+  final List<Map<String, String>> messages = [
     {
-      "sender": "shadow",
-      "text": "You shouldn't be here...",
+      "en": "You shouldn't be here...",
+      "ar": "لم يكن مفترضاً بك أن تكون هنا...",
       "time": "02:13",
       "status": "DELIVERED"
     },
     {
-      "sender": "shadow",
-      "text": "هم يراقبونك",
+      "en": "They are watching every keystroke.",
+      "ar": "إنهم يراقبون كل ضغطة زر لك.",
       "time": "02:14",
       "status": ""
     },
     {
-      "sender": "shadow",
-      "text": "Leave now. Before the trees close in.",
+      "en": "Leave now. Before the screen locks forever.",
+      "ar": "اغادر الآن.. قبل أن تتقفل الشاشة عليك للأبد.",
       "time": "02:15",
       "status": ""
     },
     {
-      "sender": "shadow",
-      "text": "لا تذهب بمفرودك... لن تجد طريق العودة",
+      "en": "You are trapped... no way back.",
+      "ar": "أنت محبوس هنا... ولن تجد طريق العودة.",
       "time": "02:16",
       "status": ""
     },
@@ -39,15 +39,15 @@ class _ShadowChatScreenState extends State<ShadowChatScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Container(
-        // خلفية داكنة توحي بأجواء الغابة المرعبة
+        // خلفية داكنة توحي بأجواء الغابة المرعبة وإدمان الشاشات
         decoration: BoxDecoration(
           color: Colors.black,
           image: DecorationImage(
             image: NetworkImage(
-                'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=1000&auto=format&fit=crop'), // خلفية أشجار داكنة مؤقتة
+                'https://images.unsplash.com/photo-1511447333015-45b65e60f6d5?q=80&w=1000&auto=format&fit=crop'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.8),
+              Colors.black.withOpacity(0.85),
               BlendMode.darken,
             ),
           ),
@@ -121,7 +121,7 @@ class _ShadowChatScreenState extends State<ShadowChatScreen> {
               ),
             ),
 
-            // قائمة المحادثة والرسائل
+            // قائمة المحادثة والرسائل المزدوجة
             Expanded(
               child: ListView.builder(
                 padding: EdgeInsets.all(16),
@@ -133,7 +133,6 @@ class _ShadowChatScreenState extends State<ShadowChatScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // صورة الكيان المصغرة بجانب الرسالة
                         CircleAvatar(
                           radius: 14,
                           backgroundColor: Colors.grey[900],
@@ -154,7 +153,7 @@ class _ShadowChatScreenState extends State<ShadowChatScreen> {
                               ),
                               SizedBox(height: 2),
                               Container(
-                                padding: EdgeInsets.all(10),
+                                padding: EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: Colors.grey[950]?.withOpacity(0.85),
                                   borderRadius: BorderRadius.circular(8),
@@ -166,14 +165,26 @@ class _ShadowChatScreenState extends State<ShadowChatScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    // النص الإنجليزي العالمي
                                     Text(
-                                      msg["text"],
+                                      msg["en"]!,
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
                                       ),
                                     ),
-                                    SizedBox(height: 4),
+                                    SizedBox(height: 6),
+                                    // الترجمة العربية للعمق النفسي
+                                    Text(
+                                      msg["ar"]!,
+                                      style: TextStyle(
+                                        color: Colors.greenAccent.withOpacity(0.8),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    SizedBox(height: 6),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
@@ -183,7 +194,7 @@ class _ShadowChatScreenState extends State<ShadowChatScreen> {
                                             style: TextStyle(color: Colors.grey, fontSize: 9),
                                           ),
                                         Text(
-                                          msg["time"],
+                                          msg["time"]!,
                                           style: TextStyle(color: Colors.grey, fontSize: 9),
                                         ),
                                       ],
@@ -201,7 +212,7 @@ class _ShadowChatScreenState extends State<ShadowChatScreen> {
               ),
             ),
 
-            // مؤشر الكتابة (The Shadow is typing...)
+            // مؤشر الكتابة السفلي
             Container(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               alignment: Alignment.centerLeft,
@@ -215,7 +226,7 @@ class _ShadowChatScreenState extends State<ShadowChatScreen> {
               ),
             ),
 
-            // صندوق كتابة الرسائل والأزرار السفلية
+            // صندوق كتابة الرسائل
             Container(
               padding: EdgeInsets.all(10),
               color: Colors.black.withOpacity(0.9),
