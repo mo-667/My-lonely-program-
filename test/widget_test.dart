@@ -8,8 +8,35 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shadow_shat/shadow_chat_screen.dart' show ShadowChatScreen;
 
 import 'package:shadow_shat/main.dart';
+
+Future<void> _openJourneyToFinalDay(WidgetTester tester) async {
+  await tester.pumpWidget(const MaterialApp(home: ShadowChatScreen()));
+  expect(find.text('افتح الباب'), findsOneWidget);
+  expect(find.text('OPEN THE DOOR'), findsOneWidget);
+  expect(find.text('الرجوع'), findsOneWidget);
+  expect(find.text('GO BACK'), findsOneWidget);
+
+  await tester.tap(find.byKey(const ValueKey('open-door')));
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 1200));
+  await tester.pumpAndSettle();
+  expect(find.text('اليوم الأول • المرحلة الأولى'), findsOneWidget);
+
+  const nextDayTitles = [
+    'اليوم الثاني • المرحلة الثانية',
+    'اليوم الثالث • المرحلة الثالثة',
+    'اليوم الرابع • المرحلة الرابعة',
+  ];
+  for (final title in nextDayTitles) {
+    await tester.tap(find.byKey(const ValueKey('next-day')));
+    await tester.pumpAndSettle();
+    expect(find.text(title), findsOneWidget);
+  }
+}
 
 void main() {
   test('duplicate Firebase initialization is ignored safely', () {
@@ -105,5 +132,56 @@ void main() {
 
     expect(find.byType(AppLockGate), findsOneWidget);
     expect(find.text('تغيير كلمة سر قفل التطبيق'), findsOneWidget);
+  });
+
+  testWidgets('door opens into all stages and the left path ends in doom', (
+    WidgetTester tester,
+  ) async {
+    await _openJourneyToFinalDay(tester);
+    expect(find.byKey(const ValueKey('ending-doom')), findsOneWidget);
+    expect(find.byKey(const ValueKey('ending-victory')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('ending-doom')));
+    await tester.pumpAndSettle();
+    expect(find.text('هلاك إلى الأبد'), findsOneWidget);
+  });
+
+  testWidgets('the right path ends in victory', (WidgetTester tester) async {
+    await _openJourneyToFinalDay(tester);
+
+    await tester.tap(find.byKey(const ValueKey('ending-victory')));
+    await tester.pumpAndSettle();
+    expect(find.text('انتصرت في الرحلة'), findsOneWidget);
+  });
+
+  testWidgets('local demo starts without initializing Firebase', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'startup_intro_seen': true,
+      'has_seen_onboarding': true,
+    });
+    firebaseReady = false;
+    appLockEnabledNotifier.value = false;
+    await tester.pumpWidget(const ShadowChatApp());
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.text('وضع العرض المحلي مفعل، تسجيل الدخول غير متاح هنا'),
+      findsOneWidget,
+    );
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  test('local demo restores dark mode on startup', () async {
+    SharedPreferences.setMockInitialValues({darkModeKey: false});
+
+    await loadAppLockSettings();
+    final preferences = await SharedPreferences.getInstance();
+
+    expect(globalDarkModeNotifier.value, isTrue);
+    expect(preferences.getBool(darkModeKey), isTrue);
   });
 }

@@ -349,7 +349,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
+    final User? user = firebaseReady ? FirebaseAuth.instance.currentUser : null;
 
     return Directionality(
       textDirection: englishLanguageNotifier.value
@@ -362,13 +362,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               child: ClipRect(
                 child: Transform.scale(
                   scale: MediaQuery.sizeOf(context).width < 600 ? 1.9 : 1.0,
-                  child: Image.asset(
-                    'assets/images/magic_bg.jpg',
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: const Color(0xFF101716),
-                    ),
-                  ),
+                  child: const ColoredBox(color: Color(0xFF101716)),
                 ),
               ),
             ),
@@ -411,7 +405,15 @@ class _ChatListScreenState extends State<ChatListScreen> {
                   ),
                 ],
               ),
-              body: user == null || !firebaseReady
+              body: !firebaseReady
+                  ? const Center(
+                      child: Text(
+                        'وضع العرض المحلي مفعل، تسجيل الدخول غير متاح هنا',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    )
+                  : user == null
                   ? const Center(
                       child: Text(
                         'يرجى تسجيل الدخول أولاً',

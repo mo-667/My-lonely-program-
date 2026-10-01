@@ -17,7 +17,7 @@ final ValueNotifier<String?> roomOwnerKeyHashNotifier = ValueNotifier<String?>(
   null,
 );
 
-const bool secureLocalDemoMode = false;
+const bool secureLocalDemoMode = true;
 final ValueNotifier<Map<String, String>> chatPasswordsNotifier =
     ValueNotifier<Map<String, String>>({});
 const int maxSecretRoomMembers = 100;
@@ -987,7 +987,12 @@ Future<void> loadAppLockSettings() async {
   await preferences.setString(appLockPasswordHashKey, passwordHash);
   appLockEnabledNotifier.value = enabled;
   appLockPasswordNotifier.value = passwordHash;
-  globalDarkModeNotifier.value = preferences.getBool(darkModeKey) ?? true;
+  if (secureLocalDemoMode) {
+    globalDarkModeNotifier.value = true;
+    await preferences.setBool(darkModeKey, true);
+  } else {
+    globalDarkModeNotifier.value = preferences.getBool(darkModeKey) ?? true;
+  }
 }
 
 Future<void> saveDarkModeSetting(bool enabled) async {
